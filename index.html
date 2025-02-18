@@ -3,120 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading - Coming Soon</title>
+    <title>AI Image Generator</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: #0d0d0d;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            padding: 10px;
-        }
-        .container {
+        /* Style for image display */
+        .image-container {
+            margin-top: 20px;
             text-align: center;
         }
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .chat-box {
-            width: 100%;
-            max-width: 400px;
-            background: #333;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .chat-message {
-            background: #444;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-        .input-container {
-            display: flex;
-            gap: 10px;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border-radius: 10px;
-            border: none;
-            background: #222;
-            color: white;
-        }
-        button {
-            padding: 10px;
-            border-radius: 10px;
-            border: none;
-            background: #ffcc00;
-            color: #222;
+        .generated-image {
+            max-width: 100%;
+            max-height: 500px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">Emdadat Al-Rowad Co.</div>
-        <div class="loading">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </div>
-        <p>We're launching soon. Stay tuned!</p>
-        
-        <!-- AI Chat Interface -->
-        <div class="chat-box" id="chatBox">
-            <div class="chat-message" id="welcomeMessage">Hello! Ask me anything.</div>
-        </div>
-        <div class="input-container">
-            <input type="text" id="userInput" placeholder="Type your message...">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+        <h1>AI Image Generator</h1>
+        <textarea id="user-input" placeholder="Enter your prompt here..."></textarea>
+        <button onclick="generateImage()">Generate Image</button>
+
+        <div class="image-container" id="image-container"></div>
     </div>
 
     <script>
-        async function sendMessage() {
-            const userMessage = document.getElementById('userInput').value;
-            if (!userMessage) return;
-            const chatBox = document.getElementById('chatBox');
-            
-            // Display user message
-            chatBox.innerHTML += `<div class="chat-message"><strong>You:</strong> ${userMessage}</div>`;
-            
-            // Clear input field
-            document.getElementById('userInput').value = '';
+        async function generateImage() {
+            const prompt = document.getElementById('user-input').value;
+            const imageContainer = document.getElementById('image-container');
 
-            // Send request to backend for AI response
+            if (prompt.trim() === "") return;
+
+            // Clear any previous images
+            imageContainer.innerHTML = "";
+
+            // Send the prompt to the backend
             const response = await fetch('/api/generate-image', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ prompt: userMessage })
+                body: JSON.stringify({ prompt: prompt }),
             });
+
             const data = await response.json();
 
-            // Display AI response
+            // If the response contains a URL, display the image
             if (data.url) {
-                chatBox.innerHTML += `<div class="chat-message"><strong>AI:</strong> <img src="${data.url}" alt="AI response" style="max-width: 100%;"></div>`;
+                imageContainer.innerHTML = `<img src="${data.url}" class="generated-image" alt="Generated Image" />`;
             } else {
-                chatBox.innerHTML += `<div class="chat-message"><strong>AI:</strong> Sorry, I couldn't process your request.</div>`;
+                imageContainer.innerHTML = "<p>Failed to generate image.</p>";
             }
         }
     </script>
 </body>
 </html>
+
