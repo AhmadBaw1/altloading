@@ -3,57 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator</title>
+    <title>AI Image Generator - Emdadat Al-Rowad Co.</title>
     <style>
-        /* Style for image display */
-        .image-container {
-            margin-top: 20px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
             text-align: center;
         }
-        .generated-image {
-            max-width: 100%;
-            max-height: 500px;
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .container {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            width: 400px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #ffcc00;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #e6b800;
+        }
+        .output {
+            margin-top: 20px;
+        }
+        img {
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
+    <div class="logo">Emdadat Al-Rowad Co.</div>
     <div class="container">
-        <h1>AI Image Generator</h1>
-        <textarea id="user-input" placeholder="Enter your prompt here..."></textarea>
+        <h2>AI Image Generator</h2>
+        <input type="text" id="prompt" placeholder="Enter your prompt...">
         <button onclick="generateImage()">Generate Image</button>
-
-        <div class="image-container" id="image-container"></div>
+        <div class="output" id="output"></div>
     </div>
-
+    
     <script>
         async function generateImage() {
-            const prompt = document.getElementById('user-input').value;
-            const imageContainer = document.getElementById('image-container');
-
-            if (prompt.trim() === "") return;
-
-            // Clear any previous images
-            imageContainer.innerHTML = "";
-
-            // Send the prompt to the backend
-            const response = await fetch('/api/generate-image', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ prompt: prompt }),
-            });
-
-            const data = await response.json();
-
-            // If the response contains a URL, display the image
-            if (data.url) {
-                imageContainer.innerHTML = `<img src="${data.url}" class="generated-image" alt="Generated Image" />`;
-            } else {
-                imageContainer.innerHTML = "<p>Failed to generate image.</p>";
+            const prompt = document.getElementById('prompt').value;
+            const output = document.getElementById('output');
+            output.innerHTML = "Generating...";
+            
+            try {
+                const response = await fetch('/api/generate-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await response.json();
+                
+                if (data.url) {
+                    output.innerHTML = `<img src="${data.url}" alt="Generated Image">`;
+                } else {
+                    output.innerHTML = "Failed to generate image.";
+                }
+            } catch (error) {
+                output.innerHTML = "Error generating image.";
             }
         }
     </script>
 </body>
 </html>
-
