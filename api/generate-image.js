@@ -14,11 +14,24 @@ export default async function handler(req, res) {
 
   try {
     const { prompt } = req.body;
-    const response = await openai.images.generate({
-      prompt,
-      n: 1,
-      size: '1024x1024',
-    });
+    try {
+  const response = await openai.images.generate({
+    prompt,
+    n: 1,
+    size: '1024x1024',
+  });
+
+  console.log("API Response:", response); // ✅ This will print the response in logs
+
+  if (!response.data || !response.data[0] || !response.data[0].url) {
+    return res.status(500).json({ error: 'Failed to generate image' });
+  }
+
+  res.status(200).json({ url: response.data[0].url });
+} catch (error) {
+  console.error("Error generating image:", error);
+  res.status(500).json({ error: error.message });
+}
 
     // This will log the response from the OpenAI API to Vercel logs
     console.log(response);
